@@ -67,15 +67,19 @@ docker exec -i "$LOCAL_DB_CONTAINER" mysql -u root -p"$LOCAL_DB_ROOT_PASSWORD" "
 
 # Update URLs in the database
 echo "Updating URLs from $PROD_WP_URL to $LOCAL_WP_URL..."
-docker exec "$LOCAL_DB_CONTAINER" mysql -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_options SET option_value = REPLACE(option_value, '$PROD_WP_URL', '$LOCAL_WP_URL') WHERE option_name IN ('siteurl', 'home');" || {
+docker exec "$LOCAL_DB_CONTAINER" mysql -v -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_options SET option_value = REPLACE(option_value, '$PROD_WP_URL', '$LOCAL_WP_URL') WHERE option_name IN ('siteurl', 'home');" || {
   echo "URL update failed!"
   exit 1
 }
-docker exec "$LOCAL_DB_CONTAINER" mysql -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_posts SET guid = REPLACE(guid, '$PROD_WP_URL', '$LOCAL_WP_URL');" || {
+docker exec "$LOCAL_DB_CONTAINER" mysql -v -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_posts SET guid = REPLACE(guid, '$PROD_WP_URL', '$LOCAL_WP_URL');" || {
   echo "GUID update failed!"
   exit 1
 }
-docker exec "$LOCAL_DB_CONTAINER" mysql -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_postmeta SET meta_value = REPLACE(meta_value, '$PROD_WP_URL', '$LOCAL_WP_URL');" || {
+docker exec "$LOCAL_DB_CONTAINER" mysql -v -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_posts SET post_content = REPLACE(post_content, '$PROD_WP_URL', '$LOCAL_WP_URL');" || {
+  echo "Post content update failed!"
+  exit 1
+}
+docker exec "$LOCAL_DB_CONTAINER" mysql -v -u "$LOCAL_DB_USER" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB_NAME" -e "UPDATE wp_postmeta SET meta_value = REPLACE(meta_value, '$PROD_WP_URL', '$LOCAL_WP_URL');" || {
   echo "Postmeta update failed!"
   exit 1
 }
