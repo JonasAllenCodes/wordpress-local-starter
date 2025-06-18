@@ -38,10 +38,6 @@ ssh "$PROD_SSH" " docker exec -i $PROD_DB_CONTAINER  mysqldump -u root -p$PROD_D
   echo "Backup failed!"
   exit 1
 }
-# ssh "$PROD_SSH" "docker cp $PROD_DB_CONTAINER:/tmp/prod-backup.sql /tmp/prod-backup.sql" || {
-#   echo "Copy from container failed!"
-#   exit 1
-# }
 
 # Sync files
 echo "Syncing files from $PROD_SSH:$PROD_WP_PATH to ./wp-content..."
