@@ -13,6 +13,13 @@ else
   exit 1
 fi
 
+# Confirmation prompt to prevent accidental sync to stage
+read -p "WARNING: This will overwrite stage data with production data. Are you sure you want to sync from production to stage? (y/N) " confirm
+if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+  echo "Sync cancelled."
+  exit 1
+fi
+
 # Verify required variables
 : ${PROD_SSH:? "PROD_SSH is not set in .env"}
 : ${PROD_DB_CONTAINER:? "PROD_DB_CONTAINER is not set in .env"}

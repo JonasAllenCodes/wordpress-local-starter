@@ -13,6 +13,13 @@ else
   exit 1
 fi
 
+# Confirmation prompt to prevent accidental sync to local
+read -p "WARNING: This will overwrite local data with stage data. Are you sure you want to sync from stage to local? (y/N) " confirm
+if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+  echo "Sync cancelled."
+  exit 1
+fi
+
 # Set default values for local variables (if not set in .env)
 LOCAL_WP_PORT="${LOCAL_WP_PORT:-8080}"
 LOCAL_WP_URL="${LOCAL_WP_URL:-http://localhost:$LOCAL_WP_PORT}"
