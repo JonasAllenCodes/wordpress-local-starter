@@ -86,4 +86,4 @@ rm -v /tmp/prod-backup.sql
 docker exec "$LOCAL_DB_CONTAINER" rm -v /tmp/prod-backup.sql
 ssh "$PROD_SSH" "rm -v /tmp/prod-backup.sql"
 
-echo "Sync complete!"
+echo "Sync from production to local complete!"

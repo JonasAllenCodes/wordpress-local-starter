@@ -86,4 +86,4 @@ rm -v /tmp/stage-backup.sql
 docker exec "$LOCAL_DB_CONTAINER" rm -v /tmp/stage-backup.sql
 ssh "$STAGE_SSH" "rm -v /tmp/stage-backup.sql"
 
-echo "Pull from staging complete!"
+echo "Sync from staging to local complete!"
