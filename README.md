@@ -1,31 +1,20 @@
 # WordPress Local Starter
 
-A robust, Docker Compose-powered WordPress development environment using the official [WordPress Docker image](https://hub.docker.com/_/wordpress) and MySQL. This project comes with ready-to-use scripts for syncing files and databases between local, staging, and production environments.
+A robust, Docker Compose-powered WordPress development environment designed for a seamless workflow between local, staging, and production environments. This starter kit leverages the official WordPress and MySQL Docker images to create a consistent and reliable development environment, while providing a powerful suite of scripts to simplify database and file synchronization.
 
----
+## Features
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Project Structure](#project-structure)
-- [Setup](#setup)
-- [Environment Variables](#environment-variables)
-- [Running the Project](#running-the-project)
-- [Deployment Scripts](#deployment-scripts)
-- [Testing](#testing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-
----
+- **Dockerized Environment:** Run a complete WordPress stack locally without installing PHP, MySQL, or Apache on your machine.
+- **Environment-Based Configuration:** Easily configure your local, staging, and production settings in a single `.env` file.
+- **Effortless Syncing:** A comprehensive set of scripts to push and pull your database and files between environments.
+- **Automated Backups:** Create timestamped backups of your database and files for any environment.
 
 ## Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/)
-- `bash` (for running sync scripts)
-- SSH access to your staging/production servers (for remote syncs)
-
----
+- `bash` (for running sync and backup scripts)
+- SSH access to your staging and production servers
 
 ## Project Structure
 
@@ -33,7 +22,17 @@ A robust, Docker Compose-powered WordPress development environment using the off
 .
 ├── docker-compose.yml
 ├── .env.example
+├── backups/
 ├── scripts/
+│   ├── backup-local-db.sh
+│   ├── backup-local-files.sh
+│   ├── backup-local.sh
+│   ├── backup-prod-db.sh
+│   ├── backup-prod-files.sh
+│   ├── backup-prod.sh
+│   ├── backup-staging-db.sh
+│   ├── backup-staging-files.sh
+│   ├── backup-staging.sh
 │   ├── sync-db-local-to-prod.sh
 │   ├── sync-db-local-to-stage.sh
 │   ├── sync-db-prod-to-local.sh
@@ -52,120 +51,84 @@ A robust, Docker Compose-powered WordPress development environment using the off
 │   ├── sync-prod-to-stage.sh
 │   ├── sync-stage-to-local.sh
 │   └── sync-stage-to-prod.sh
-├── ... (WordPress and project files)
+└── wp-content/
 ```
 
-> **Note:** Only a portion of the scripts are shown above. [View the full script listing here.](https://github.com/JonasAllenCodes/wordpress-local-starter/tree/main/scripts)
+## Getting Started
 
----
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/JonasAllenCodes/wordpress-local-starter.git
+    cd wordpress-local-starter
+    ```
 
-## Setup
+2.  **Configure your environment:**
+    Copy the example environment file and customize it with your settings.
+    ```sh
+    cp .env.example .env
+    ```
+    Open the `.env` file and fill in the required variables for your local, staging, and production environments.
 
-1. **Clone the repository:**
+3.  **Start the project:**
+    ```sh
+    docker-compose up -d
+    ```
+    This will build and start the WordPress and MySQL containers in the background.
 
-   ```sh
-   git clone https://github.com/JonasAllenCodes/wordpress-local-starter.git
-   cd wordpress-local-starter
-   ```
-
-2. **Copy the example environment file and configure it:**
-
-   ```sh
-   cp .env.example .env
-   # Edit .env with your preferred settings
-   ```
-
-3. **(Optional) Prepare SSH keys** for remote environments if you plan to use sync scripts.
-
----
-
-## Environment Variables
-
-All environment variables are configured in `.env`. Refer to `.env.example` for a full list. Key variables include:
-
-- `LOCAL_PROJECT_NAME` — Name of your local project (used for containers, etc.)
-- `LOCAL_DB_NAME`, `LOCAL_DB_USER`, `LOCAL_DB_PASSWORD`, `LOCAL_DB_ROOT_PASSWORD` — Local MySQL settings
-- `LOCAL_DB_VERSION`, `LOCAL_WP_VERSION` — MySQL and WordPress versions (default to latest if unset)
-- `LOCAL_WP_PORT` — Port for local WordPress (default: 8000)
-- `LOCAL_WP_URL` — Local WordPress site URL
-- `LOCAL_DB_CONTAINER` — Name of the local DB container
-- **Production Variables:** `PROD_SSH`, `PROD_DB_NAME`, `PROD_DB_USER`, `PROD_DB_PASSWORD`, `PROD_DB_ROOT_PASSWORD`, `PROD_WP_CONTAINER`, `PROD_WP_PATH`, `PROD_WP_URL`
-- **Staging Variables:** `STAGE_SSH`, `STAGE_DB_NAME`, `STAGE_DB_USER`, `STAGE_DB_PASSWORD`, `STAGE_DB_ROOT_PASSWORD`, `STAGE_WP_PATH`, `STAGE_DB_CONTAINER`, `STAGE_WP_URL`
-
-> See comments in `.env.example` for details on each variable.
-
----
+4.  **Access your local site:**
+    Open your web browser and navigate to `http://localhost:${LOCAL_WP_PORT}` (the default port is `8080`).
 
 ## Running the Project
 
-1. **Start Docker Compose:**
+-   **Start the containers:**
+    ```sh
+    docker-compose up -d
+    ```
 
-   ```sh
-   docker-compose up -d
-   ```
+-   **Stop the containers:**
+    ```sh
+    docker-compose down
+    ```
 
-2. **Access your local WordPress site:**
-   Visit `http://localhost:${LOCAL_WP_PORT}` (default: `http://localhost:8000`).
+## Scripts
 
-3. **Stop and remove containers and networks:**
-   ```sh
-   docker-compose down
-   ```
-   This will stop and remove all containers, networks, and volumes created by `up`. Use this command when you want to shut everything down safely.
+All scripts are located in the `scripts/` directory and are designed to be run from the project root.
 
----
+### Sync Scripts
 
-## Deployment Scripts
+The sync scripts allow you to move your database and files between your local, staging, and production environments.
 
-Sync your files and database between environments using the scripts in the `scripts/` directory. Some commonly used scripts:
+| Script                         | Description                                             |
+| ------------------------------ | ------------------------------------------------------- |
+| `sync-db-[source]-to-[dest].sh`  | Syncs the database from the source to the destination.  |
+| `sync-files-[source]-to-[dest].sh` | Syncs the `wp-content` directory to the destination.    |
+| `sync-[source]-to-[dest].sh`     | Syncs both the database and files to the destination. |
 
-- **Database Sync:**
+**Example:** To sync the production database to your local environment, run:
+```sh
+./scripts/sync-db-prod-to-local.sh
+```
 
-  - Local → Prod: [`sync-db-local-to-prod.sh`](scripts/sync-db-local-to-prod.sh)
-  - Local → Stage: [`sync-db-local-to-stage.sh`](scripts/sync-db-local-to-stage.sh)
-  - Prod → Local: [`sync-db-prod-to-local.sh`](scripts/sync-db-prod-to-local.sh)
-  - Stage → Local: [`sync-db-stage-to-local.sh`](scripts/sync-db-stage-to-local.sh)
-  - ...and more
+### Backup Scripts
 
-- **File Sync:**
+The backup scripts create timestamped backups of your database and files, storing them in the `backups/` directory.
 
-  - Local → Prod: [`sync-files-local-to-prod.sh`](scripts/sync-files-local-to-prod.sh)
-  - Local → Stage: [`sync-files-local-to-stage.sh`](scripts/sync-files-local-to-stage.sh)
-  - Prod → Local: [`sync-files-prod-to-local.sh`](scripts/sync-files-prod-to-local.sh)
-  - Stage → Local: [`sync-files-stage-to-local.sh`](scripts/sync-files-stage-to-local.sh)
-  - ...and more
+| Script                      | Description                                       |
+| --------------------------- | ------------------------------------------------- |
+| `backup-[env]-db.sh`        | Backs up the database for the specified environment. |
+| `backup-[env]-files.sh`     | Backs up the files for the specified environment.   |
+| `backup-[env].sh`           | Backs up both the database and files.             |
 
-- **Full Environment Sync:**
-  - Local → Prod: [`sync-local-to-prod.sh`](scripts/sync-local-to-prod.sh)
-  - Local → Stage: [`sync-local-to-stage.sh`](scripts/sync-local-to-stage.sh)
-  - Prod → Local: [`sync-prod-to-local.sh`](scripts/sync-prod-to-local.sh)
-  - Stage → Local: [`sync-stage-to-local.sh`](scripts/sync-stage-to-local.sh)
-
-> Ensure you have configured the relevant environment variables in `.env` before running any scripts.
-
-> **More scripts may exist. [Browse all scripts here.](https://github.com/JonasAllenCodes/wordpress-local-starter/tree/main/scripts)**
-
----
-
-## Testing
-
-- **Manual:** After setup, visit your local site and verify WordPress loads and you can log in.
-- **Automated:** Add your own tests or use [WordPress test plugins](https://wordpress.org/plugins/tags/test/) as needed.
-- **Docker Healthchecks:** Optionally add [healthcheck configuration](https://docs.docker.com/compose/compose-file/05-services/#healthcheck) to your `docker-compose.yml` for CI/CD integration.
-
----
+**Example:** To back up the local database, run:
+```sh
+./scripts/backup-local-db.sh
+```
 
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
----
-
 ## Acknowledgments
 
 - [WordPress Docker Image](https://hub.docker.com/_/wordpress)
-- [Docker](https://www.docker.com/)
 - [MySQL Docker Image](https://hub.docker.com/_/mysql)
-- [JonasAllenCodes/wordpress-local-starter](https://github.com/JonasAllenCodes/wordpress-local-starter)
-
----
