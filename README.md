@@ -78,6 +78,37 @@ A robust, Docker Compose-powered WordPress development environment designed for 
 4.  **Access your local site:**
     Open your web browser and navigate to `http://localhost:${LOCAL_WP_PORT}` (the default port is `8080`).
 
+## Managing `wp-content/`
+
+The `wp-content/` directory is intentionally ignored by this starter project's Git repository. This allows you to manage your themes, plugins, and uploads as a completely separate Git repository for each individual project you create using this starter. This ensures that you can pull updates to the starter's environment and scripts without affecting your project-specific WordPress content.
+
+When you clone this starter, the `wp-content/` directory will be empty. You have two main options:
+
+### Option 1: Start a New `wp-content/` Repository
+
+If you are starting a brand new WordPress project, you can initialize a new Git repository within the `wp-content/` directory:
+
+```sh
+cd wp-content
+git init
+git add .
+git commit -m "Initial commit for wp-content"
+# Link to your remote repository (e.g., GitHub, GitLab, Bitbucket)
+git remote add origin <your-wp-content-repo-url>
+git push -u origin master
+```
+
+### Option 2: Clone an Existing `wp-content/` Repository
+
+If you have an existing WordPress project with its `wp-content/` directory already under Git version control, you can clone it directly into the `wp-content/` directory after cloning this starter:
+
+```sh
+cd wp-content
+git clone <your-existing-wp-content-repo-url> .
+```
+
+Remember to configure your `.env` file and start your Docker containers as described in the "Getting Started" section.
+
 ## Running the Project
 
 -   **Start the containers:**
